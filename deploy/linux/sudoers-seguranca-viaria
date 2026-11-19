@@ -1,0 +1,7 @@
+# Permite ao usuário da aplicação (svapp) reiniciar SÓ a VPN, sem senha — usado pelo botão "Reiniciar VPN".
+# Instalar:  sudo visudo -f /etc/sudoers.d/seguranca-viaria   (cole a linha da sua VPN)
+#
+# OpenVPN (arquivo /etc/openvpn/client/pumatronix.conf):
+svapp ALL=(root) NOPASSWD: /usr/bin/systemctl restart openvpn-client@pumatronix
+# WireGuard (arquivo /etc/wireguard/wg0.conf):
+# svapp ALL=(root) NOPASSWD: /usr/bin/systemctl restart wg-quick@wg0

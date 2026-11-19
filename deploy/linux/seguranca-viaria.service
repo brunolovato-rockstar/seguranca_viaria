@@ -1,0 +1,20 @@
+# Serviço systemd da aplicação (servidor Node + site já compilado em web/dist).
+# Copie para /etc/systemd/system/ e ajuste User e caminhos se instalar em outro lugar.
+[Unit]
+Description=Seguranca Viaria (POC Pumatronix)
+After=network-online.target mysql.service mariadb.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=svapp
+WorkingDirectory=/opt/seguranca-viaria/server
+ExecStart=/usr/bin/node src/index.js
+# Sobe de novo sozinho se cair, e quando o botão "Reiniciar servidor" (RESTART_BY_EXIT=1) encerra o processo
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+# log também fica em: journalctl -u seguranca-viaria -f   e em server/storage/logs/
+
+[Install]
+WantedBy=multi-user.target

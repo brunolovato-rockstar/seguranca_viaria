@@ -1,0 +1,15 @@
+node_modules/
+dist/
+
+# segredos e dados locais (nunca vão para o GitHub)
+server/.env
+server/storage/
+server/diagnostico-camera.txt
+snapshot-teste.jpg
+*.log
+
+# editor / sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

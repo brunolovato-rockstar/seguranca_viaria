@@ -1,0 +1,27 @@
+{
+  "name": "poc-seguranca-viaria-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend da POC Segurança Viária (Node + MySQL) com integração de câmera via HTTP API",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "db:init": "node scripts/db-init.js",
+    "mock": "node scripts/mock-camera.js",
+    "camera:test": "node scripts/camera-test.js",
+    "diag": "node scripts/diag-export.js",
+    "camera:check": "node scripts/camera-check.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.5",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

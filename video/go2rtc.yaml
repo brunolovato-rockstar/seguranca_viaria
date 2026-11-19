@@ -1,0 +1,19 @@
+# go2rtc — leva o vídeo RTSP da câmera para o navegador (WebRTC / MSE), com baixa latência.
+#
+# 1) Baixe "go2rtc_win64.zip" em https://github.com/AlexxIT/go2rtc/releases
+# 2) Extraia o go2rtc.exe NESTA pasta (video\)
+# 3) Rode aqui:   .\go2rtc.exe        (ele lê este go2rtc.yaml sozinho)
+# 4) Painel do go2rtc: http://localhost:1984
+#
+# Não cadastre câmeras aqui: o servidor Node registra cada câmera (CAM-01, CAM-02...)
+# usando a "URL RTSP" do cadastro + usuário/senha da câmera.
+api:
+  listen: ":1984"
+  origin: "*"
+
+webrtc:
+  listen: ":8555"
+  candidates:
+    - 127.0.0.1:8555
+
+streams: {}
