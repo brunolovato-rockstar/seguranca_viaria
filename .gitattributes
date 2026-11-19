@@ -1,0 +1,4 @@
+# scripts do Linux sempre com fim de linha LF (mesmo commitando pelo Windows)
+*.sh text eol=lf
+*.service text eol=lf
+deploy/linux/sudoers-* text eol=lf
