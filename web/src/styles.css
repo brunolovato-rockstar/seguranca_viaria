@@ -532,14 +532,21 @@ pre.raw { font-family: var(--fm); font-size: 11.5px; white-space: pre-wrap; word
 .mc-sw input { accent-color: var(--blue); }
 .map-ov { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 .map-ov > * { pointer-events: auto; }
-.mc-strip { position: absolute; left: 12px; top: 12px; right: 64px; display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; pointer-events: none; }
+.mc-strip { position: absolute; left: 12px; top: 12px; right: 64px; display: grid; grid-template-columns: repeat(auto-fill, 176px); gap: 8px; align-content: start; pointer-events: none; }
+.mc-strip .mc-scope { grid-column: 1 / -1; justify-self: start; }
 .mc-strip > * { pointer-events: auto; }
 .mc-scope { align-self: center; font-size: 11.5px; font-weight: 600; color: #fff; background: rgba(15, 23, 32, .78); padding: 4px 8px; border-radius: 4px; }
-.mc { display: flex; align-items: center; gap: 10px; min-width: 150px; padding: 8px 12px 8px 10px; border-radius: 6px; background: color-mix(in oklab, var(--panel) 90%, transparent); backdrop-filter: blur(6px); border: 1px solid var(--line2); border-left: 4px solid var(--gc); box-shadow: 0 4px 14px rgba(0,0,0,.18); transition: transform .2s; }
+.mc { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 12px 8px 10px; border-radius: 6px; background: color-mix(in oklab, var(--panel) 90%, transparent); backdrop-filter: blur(6px); border: 1px solid var(--line2); border-left: 4px solid var(--gc); box-shadow: 0 4px 14px rgba(0,0,0,.18); transition: transform .2s; }
 .mc-ic { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: var(--gc); background: color-mix(in oklab, var(--gc) 14%, transparent); flex: none; }
 .mc-ic svg { width: 17px; height: 17px; }
-.mc-t { display: flex; flex-direction: column; line-height: 1.15; }
-.mc-t small { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.mc-t { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.mc-t small { font-size: 11.5px; color: var(--muted); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (max-width: 1500px) {
+  .mc-strip { grid-template-columns: repeat(auto-fill, 150px); gap: 6px; }
+  .mc { gap: 8px; padding: 6px 10px 6px 8px; }
+  .mc-ic { width: 26px; height: 26px; } .mc-ic svg { width: 15px; height: 15px; }
+  .mc-t b { font-size: 19px; } .mc-t small { font-size: 11px; }
+}
 .mc-t b { font-size: 22px; font-family: var(--fm); font-weight: 600; color: var(--text); }
 .mc.bump { transform: scale(1.06); }
 .mc.bump .mc-t b { color: var(--gc); }
