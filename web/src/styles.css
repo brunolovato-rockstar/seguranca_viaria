@@ -579,3 +579,4 @@ pre.raw { font-family: var(--fm); font-size: 11.5px; white-space: pre-wrap; word
 .ll.aviso .lm { color: #E5B567; } .ll.erro .lm { color: #FF8A8E; } .ll.erro { background: rgba(224,72,77,.08); }
 .ll.muted { display: block; color: #6E7C8A; }
 .sys-out pre.raw { padding: 10px 16px; color: var(--text); }
+.tag-imp { font-size: 11.5px; font-weight: 600; color: var(--warn); background: var(--warn-bg); padding: 1px 6px; border-radius: 3px; }

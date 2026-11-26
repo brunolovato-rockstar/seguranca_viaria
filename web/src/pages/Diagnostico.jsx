@@ -166,7 +166,8 @@ function Sistema() {
           <small>Banco de dados</small>
           <b className={st?.banco?.ok ? 'ok' : 'bad'}>{st ? (st.banco.ok ? 'OK' : 'Falha') : '—'}</b>
           <span>{st?.banco?.ok ? `responde em ${st.banco.ms} ms` : st?.banco?.erro}</span>
-          <span className="muted">Captura {s?.captura ? 'ligada' : 'pausada'}</span>
+          <span className="muted">Captura {s?.captura ? 'ligada' : 'pausada'} · ANPR {s?.salvar_anpr === false ? 'não gravado (SALVAR_ANPR=0)' : 'gravando'}</span>
+          {s?.disco && <span className={s.disco.livre_gb < 5 ? 'bad-t' : 'muted'}>Disco: {String(s.disco.livre_gb).replace('.', ',')} GB livres de {String(s.disco.total_gb).replace('.', ',')} GB</span>}
         </div>
         {(st?.cameras || []).map((c) => (
           <div key={c.id} className="panel sys-card">

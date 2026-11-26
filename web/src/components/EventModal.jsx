@@ -74,6 +74,7 @@ export default function EventModal({ id, ids = [], onClose, onChange }) {
   }, [prev, next, validar, onClose, zoom, imgEvento, imgOutra]);
 
   const corrigida = !!ev?.placa_ocr;
+  const importado = (() => { try { const d = typeof ev?.dados === 'string' ? JSON.parse(ev.dados) : ev?.dados; return d?.importado || null; } catch { return null; } })();
   const ultimaCorr = ev?.log?.find((l) => l.acao === 'Placa corrigida');
 
   return (
@@ -86,7 +87,7 @@ export default function EventModal({ id, ids = [], onClose, onChange }) {
             <>
               <div className="dt-head" style={{ '--gc': g.c, '--gbg': g.bg }}>
                 <div className="dt-ic"><Icon n={AN_ICON[ev.chave]} /></div>
-                <div className="dt-tt"><small>{g.n}</small><h2>{ev.analitico_nome || ev.codigo_origem}</h2><p>Código da câmera: <span className="mono">{ev.codigo_origem}</span> · origem {ev.origem === 'itsapi' ? 'ITSAPI (push)' : 'HTTP API'}</p></div>
+                <div className="dt-tt"><small>{g.n}</small><h2>{ev.analitico_nome || ev.codigo_origem}</h2><p>Código da câmera: <span className="mono">{ev.codigo_origem}</span> · origem {ev.origem === 'itsapi' ? 'ITSAPI (push)' : 'HTTP API'}{importado && <> · <span className="tag-imp">importado do teste (#{importado.id})</span></>}</p></div>
                 <div className="dt-r"><div><b>#{ev.id}</b>{fmtDT(ev.ocorrido_em)}{pos >= 0 && <div>{pos + 1} de {ids.length}</div>}</div><button className="btn icon" onClick={onClose} aria-label="Fechar">✕</button></div>
               </div>
               {ev.status_validacao === 'validado' ? (

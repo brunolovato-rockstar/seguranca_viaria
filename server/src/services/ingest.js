@@ -54,10 +54,11 @@ export async function ingest({ camera, origem, ev, imagens = [], raw = '' }) {
     }
   }
   const an = chave ? analiticos.get(chave) : null;
-  const desativado = an && !an.ativo;
+  const semAnpr = chave === 'anpr' && !config.salvarAnpr; // SALVAR_ANPR=0 no .env (servidor com disco limitado)
+  const desativado = (an && !an.ativo) || semAnpr;
   const bruto = await q('INSERT INTO eventos_brutos (camera_id, origem, codigo, imagens, payload, erro) VALUES (?,?,?,?,?,?)', [
-    camera?.id || null, origem, String(ev.codigo).slice(0, 80), imagens.length, String(raw).slice(0, 60000),
-    !chave ? 'Código sem mapeamento em analitico_codigos' : desativado ? 'Analítico desativado (não gravado)' : null,
+    camera?.id || null, origem, String(ev.codigo).slice(0, 80), imagens.length, semAnpr ? null : String(raw).slice(0, 60000),
+    !chave ? 'Código sem mapeamento em analitico_codigos' : semAnpr ? 'ANPR não gravado (SALVAR_ANPR=0)' : desativado ? 'Analítico desativado (não gravado)' : null,
   ]);
   broadcast('bruto', { camera_id: camera?.id || null, codigo: ev.codigo, chave, imagens: imagens.length, ts: Date.now() });
   if (!chave || desativado) return null; // só vira registro o que estiver mapeado e ativo

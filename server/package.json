@@ -11,7 +11,9 @@
     "mock": "node scripts/mock-camera.js",
     "camera:test": "node scripts/camera-test.js",
     "diag": "node scripts/diag-export.js",
-    "camera:check": "node scripts/camera-check.js"
+    "camera:check": "node scripts/camera-check.js",
+    "historico:exportar": "node scripts/historico-exportar.js",
+    "historico:importar": "node scripts/historico-importar.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

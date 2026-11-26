@@ -21,5 +21,7 @@ export const config = {
   snapshotMinIntervalMs: Number(process.env.SNAPSHOT_MIN_INTERVAL_MS || 300),
   go2rtcUrl: process.env.GO2RTC_URL || 'http://localhost:1984',
   mapboxToken: process.env.MAPBOX_TOKEN || '',
+  // 0 = não grava leituras de placa (ANPR): nem registro, nem fotos, nem o texto bruto. Infrações continuam normais.
+  salvarAnpr: process.env.SALVAR_ANPR !== '0',
   mapboxStyle: process.env.MAPBOX_STYLE || '',
 };

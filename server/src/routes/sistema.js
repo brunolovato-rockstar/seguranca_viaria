@@ -9,6 +9,7 @@ import { pool, q } from '../db.js';
 import { requireAdmin } from '../auth.js';
 import { lerLogs, arquivoHoje } from '../services/logbuf.js';
 import { getStatus, reconectar, getCaptura } from '../services/cameraManager.js';
+import { config } from '../config.js';
 
 export const sistemaRouter = express.Router();
 sistemaRouter.use(requireAdmin);
@@ -53,11 +54,16 @@ sistemaRouter.get('/status', async (req, res) => {
   const cameras = await Promise.all(cams.map(async (c) => ({ ...c, status: st[c.id] || null, rede: c.ativo ? await testarRede(c.url_base) : null })));
   const vpn = VPN_STATUS ? await rodar(VPN_STATUS, 10000) : null;
   const m = process.memoryUsage();
+  let disco = null;
+  try {
+    const f = await fs.promises.statfs(config.storageDir);
+    disco = { total_gb: +(f.blocks * f.bsize / 1e9).toFixed(1), livre_gb: +(f.bavail * f.bsize / 1e9).toFixed(1) };
+  } catch { /* Node sem statfs */ }
   res.json({
     servidor: {
       inicio, uptime_s: Math.round((Date.now() - inicio) / 1000), pid: process.pid, node: process.version,
       so: `${os.type()} ${os.release()}`, host: os.hostname(), memoria_mb: Math.round(m.rss / 1048576),
-      carga: os.loadavg()[0], captura: getCaptura(),
+      carga: os.loadavg()[0], captura: getCaptura(), salvar_anpr: config.salvarAnpr, disco,
     },
     banco,
     cameras,
