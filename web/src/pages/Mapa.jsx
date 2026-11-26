@@ -187,6 +187,8 @@ export default function Mapa() {
   const modeRef = useRef(mode);
   modeRef.current = mode;
   const [ultimos, setUltimos] = useState([]);
+  const [novos, setNovos] = useState(() => new Set());
+  const vistos = useRef({ cam: null, ids: new Set() });
   const [open, setOpen] = useState(null);
   const area = useRef(null);
   const [ans, setAns] = useState([]);
@@ -298,10 +300,22 @@ export default function Mapa() {
   }, []);
 
   // seleção: voa até a câmera e carrega os últimos registros
+  useEffect(() => { // só ao escolher a câmera (não a cada detecção, para não tirar o mapa de onde o usuário deixou)
+    if (atual && temLocal(atual) && map.current) map.current.flyTo({ center: [atual.longitude, atual.latitude], zoom: Math.max(map.current.getZoom(), 16), speed: 1.4, ...(tresRef.current ? { pitch: 60 } : {}) });
+  }, [sel]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!atual) { setUltimos([]); return; }
-    if (temLocal(atual) && map.current) map.current.flyTo({ center: [atual.longitude, atual.latitude], zoom: Math.max(map.current.getZoom(), 16), speed: 1.4, ...(tresRef.current ? { pitch: 60 } : {}) });
-    api(`/eventos?camera=${atual.id}&size=8&excluir=anpr`).then((r) => setUltimos(r.items)).catch(() => setUltimos([]));
+    if (!atual) { setUltimos([]); vistos.current = { cam: null, ids: new Set() }; return; }
+    api(`/eventos?camera=${atual.id}&size=8&excluir=anpr`).then((r) => {
+      // o que chegou desde a última atualização desta câmera ganha destaque por alguns segundos
+      const v = vistos.current;
+      const chegaram = v.cam === atual.id ? r.items.filter((e) => !v.ids.has(e.id)).map((e) => e.id) : [];
+      vistos.current = { cam: atual.id, ids: new Set([...v.ids, ...r.items.map((e) => e.id)]) };
+      if (chegaram.length) {
+        setNovos((n) => new Set([...n, ...chegaram]));
+        setTimeout(() => setNovos((n) => { const m = new Set(n); chegaram.forEach((id) => m.delete(id)); return m; }), 12000);
+      }
+      setUltimos(r.items);
+    }).catch(() => setUltimos([]));
   }, [sel, atual?.hoje.total]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const aoVivo = (c) => { localStorage.setItem('sv_cam', c.id); nav('/ao-vivo'); };
@@ -400,10 +414,12 @@ export default function Mapa() {
                 <h6 className="ms-h">Últimas infrações<span className="muted"> (sem ANPR)</span></h6>
                 <div className="ms-evs">
                   {ultimos.map((e) => (
-                    <button key={e.id} className="ms-ev" onClick={() => setOpen(e.id)}>
+                    <button key={e.id} className={`ms-ev ${novos.has(e.id) ? 'novo' : ''}`} onClick={() => setOpen(e.id)}>
                       {e.imagens?.[0] ? <img src={media(e.imagens[0].url)} alt="" loading="lazy" /> : <span className="noimg" />}
-                      <span className="ms-ev-t"><AnBadge chave={e.chave} nome={e.analitico_nome} grupo={e.analitico_grupo} /><small>{fmtT(e.ocorrido_em)} · #{e.id}</small></span>
-                      {e.placa && <Plate p={e.placa} />}
+                      <span className="ms-ev-t">
+                        <span className="ms-ev-an"><AnBadge chave={e.chave} nome={e.analitico_nome} grupo={e.analitico_grupo} />{novos.has(e.id) && <em className="ms-novo">novo</em>}</span>
+                        <span className="ms-ev-l"><Plate p={e.placa} /><small>{fmtT(e.ocorrido_em)} · #{e.id}</small></span>
+                      </span>
                     </button>
                   ))}
                   {!ultimos.length && <p className="muted ms-p">Sem registros.</p>}

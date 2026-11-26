@@ -387,12 +387,18 @@ pre.raw { font-family: var(--fm); font-size: 11.5px; white-space: pre-wrap; word
 .ms-ans > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .ms-ans b { font-family: var(--fm); font-size: 13px; }
 .ms-evs { display: flex; flex-direction: column; gap: 6px; }
-.ms-ev { display: grid; grid-template-columns: 64px 1fr auto; gap: 10px; align-items: center; padding: 6px; border: 1px solid var(--line); border-radius: 5px; background: none; cursor: pointer; text-align: left; font: inherit; color: var(--text); }
+.ms-ev { display: grid; grid-template-columns: 72px 1fr; gap: 10px; align-items: center; padding: 6px; border: 1px solid var(--line); border-radius: 5px; background: none; cursor: pointer; text-align: left; font: inherit; color: var(--text); }
 .ms-ev:hover { border-color: var(--blue); }
-.ms-ev img, .ms-ev .noimg { width: 64px; height: 40px; object-fit: cover; border-radius: 3px; background: #05080b; display: block; }
-.ms-ev-t { display: flex; flex-direction: column; gap: 3px; min-width: 0; align-items: flex-start; }
+.ms-ev img, .ms-ev .noimg { width: 72px; height: 48px; object-fit: cover; border-radius: 3px; background: #05080b; display: block; }
+.ms-ev-t { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.ms-ev-an { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ms-ev-an .anb { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ms-ev-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ms-novo { flex: none; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: var(--blue); padding: 2px 6px; border-radius: 3px; animation: pulse 1.4s infinite; }
+.ms-ev.novo { border-color: var(--blue); animation: msnovo 12s ease-out; }
+@keyframes msnovo { 0% { background: var(--acc-bg); transform: translateX(-8px); opacity: .4; } 4% { transform: none; opacity: 1; } 75% { background: var(--acc-bg); } 100% { background: transparent; } }
 .ms-ev-t small { color: var(--muted); font-size: 11.5px; font-family: var(--fm); }
-.ms-ev .plate { transform: scale(.8); transform-origin: right center; }
+.ms-ev .plate { transform: scale(.82); transform-origin: left center; margin-right: -14px; flex: none; }
 /* marcadores */
 .mk { display: flex; flex-direction: column; align-items: center; width: max-content; cursor: pointer; background: none; --c: var(--dim); }
 .mk.mk--ok { --c: #1F8A4C; } .mk.mk--warn { --c: #B26A00; } .mk.mk--bad { --c: #C2363B; } .mk.mk--off { --c: #8693A2; }
