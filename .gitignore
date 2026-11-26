@@ -13,3 +13,7 @@ snapshot-teste.jpg
 .idea/
 .DS_Store
 Thumbs.db
+
+# pacotes de migração de histórico (fotos) — nunca vão para o GitHub
+exportacao-historico/
+*.tgz

@@ -2,6 +2,7 @@
 import express from 'express';
 import { q, one } from '../db.js';
 import { tipoPt } from '../dahua/normalize.js';
+import { config } from '../config.js';
 
 export const dashboardRouter = express.Router();
 
@@ -94,6 +95,7 @@ async function montar(req, res) {
   });
 
   res.json({
+    anpr_gravado: config.salvarAnpr,
     periodo: { de, ate, dias: nDias, granularidade: porHora ? 'hora' : 'dia', anterior: { de: antDe, ate: antAte } },
     kpis: nk(k),
     kpisAnterior: nk(kAnt),

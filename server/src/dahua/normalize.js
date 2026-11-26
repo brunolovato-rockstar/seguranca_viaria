@@ -19,10 +19,20 @@ const cleanPlate = (p) => {
   return s && !/^(UNKNOWN|NULL|0+)$/.test(s) ? s.slice(0, 12) : null;
 };
 
+// O campo "UTC" da Dahua costuma trazer a HORA LOCAL da câmera contada como se fosse UTC
+// (ex.: 10:47 em Brasília chega como 10:47Z). Lemos dos dois jeitos e ficamos com o que
+// está mais perto do relógio do servidor: assim funciona com firmware que manda UTC de verdade também.
 function parseCamTime(v) {
   if (!v) return null;
-  if (/^\d{9,10}$/.test(String(v))) return new Date(Number(v) * 1000);
-  const d = new Date(String(v).replace(' ', 'T'));
+  if (/^\d{9,13}$/.test(String(v))) {
+    const ms = String(v).length > 10 ? Number(v) : Number(v) * 1000;
+    const comoUtc = new Date(ms);
+    const comoLocal = new Date(comoUtc.getUTCFullYear(), comoUtc.getUTCMonth(), comoUtc.getUTCDate(),
+      comoUtc.getUTCHours(), comoUtc.getUTCMinutes(), comoUtc.getUTCSeconds(), comoUtc.getUTCMilliseconds());
+    const agora = Date.now();
+    return Math.abs(comoLocal - agora) < Math.abs(comoUtc - agora) ? comoLocal : comoUtc;
+  }
+  const d = new Date(String(v).replace(' ', 'T')); // texto "2026-11-26 10:47:32" = hora local
   return Number.isNaN(d.getTime()) ? null : d;
 }
 

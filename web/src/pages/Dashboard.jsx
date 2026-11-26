@@ -104,7 +104,10 @@ function Empilhadas({ serie, gran, onBar }) {
   const barW = Math.max(3, Math.min(34, bw * 0.62));
   const y = (v) => T + (H - T - B) * (1 - v / max);
   const pico = tot.indexOf(Math.max(...tot));
-  const cada = Math.ceil(n / Math.floor((W - L) / 34)); // rótulos do eixo X sem encavalar
+  const cada = Math.ceil(n / Math.floor((W - L) / (gran === 'hora' ? 34 : 46))); // rótulos do eixo X sem encavalar
+  const temPico = tot[pico] > 0;
+  // o rótulo do pico sempre aparece; os vizinhos que encostariam nele ficam de fora
+  const mostra = (i) => (temPico && i === pico) || (i % cada === 0 && (!temPico || Math.abs(i - pico) >= cada));
   return (
     <div ref={ref} className="db-plot" onMouseLeave={hide}>
       <svg width={W} height={H} role="img" aria-label="Infrações por período, empilhadas por grupo">
@@ -131,7 +134,7 @@ function Empilhadas({ serie, gran, onBar }) {
                 const h = Math.max(1, y0 - y1 - (top ? 0 : 2)); // 2px de respiro entre segmentos
                 return <path key={g} fill={`var(--v-${g})`} d={barPath(cx - barW / 2, y1, barW, h, top ? 3 : 0)} />;
               })}
-              {(i % cada === 0 || i === pico) && <text x={cx} y={H - 8} className={`db-ax ${i === pico && tot[i] ? 'pk' : ''}`} textAnchor="middle">{rotulo(s.b, gran)}</text>}
+              {mostra(i) && <text x={cx} y={H - 8} className={`db-ax ${i === pico && tot[i] ? 'pk' : ''}`} textAnchor="middle">{rotulo(s.b, gran)}</text>}
             </g>
           );
         })}
@@ -160,7 +163,7 @@ function Fluxo({ serie, gran, campo = 'anpr' }) {
   const x = (i) => L + ((W - L - R) * i) / Math.max(1, n - 1);
   const y = (v) => T + (H - T - B) * (1 - v / max);
   const pts = vals.map((v, i) => `${x(i)},${y(v)}`).join(' ');
-  const cada = Math.ceil(n / Math.floor((W - L) / 40));
+  const cada = Math.ceil(n / Math.floor((W - L) / (gran === 'hora' ? 40 : 46)));
   const mover = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
     const i = Math.round(((e.clientX - r.left - L) / (W - L - R)) * (n - 1));
@@ -285,7 +288,8 @@ export default function Dashboard() {
     const m = Math.max(...tot);
     return m ? { b: d.serie[tot.indexOf(m)].b, n: m } : null;
   }, [d]);
-  const indice = k.anpr ? (k.infracoes / k.anpr) * 1000 : null;
+  const semAnpr0 = d?.anpr_gravado === false; // SALVAR_ANPR=0 no servidor
+  const indice = k.anpr && !semAnpr0 ? (k.infracoes / k.anpr) * 1000 : null;
   const periodoTxt = d ? (d.periodo.dias === 1 ? (per.de === hoje() ? 'hoje' : fmtDia(per.de)) : `${fmtDia(per.de)} a ${fmtDia(per.ate)}`) : '';
 
   return (
@@ -308,9 +312,9 @@ export default function Dashboard() {
         <div className="db">
           <div className="db-kpis">
             <Kpi label="Infrações detectadas" value={fmtN(k.infracoes)} sub={<Delta v={k.infracoes} ant={ka.infracoes} />} onClick={() => regs({ chaves: semAnpr })} />
-            <Kpi label="Placas lidas (ANPR)" value={fmtN(k.anpr)} sub={<Delta v={k.anpr} ant={ka.anpr} />} onClick={() => regs({ chaves: 'anpr' })} />
+            <Kpi label="Placas lidas (ANPR)" value={semAnpr0 ? '—' : fmtN(k.anpr)} sub={semAnpr0 ? 'leituras de placa não são gravadas neste servidor' : <Delta v={k.anpr} ant={ka.anpr} />} onClick={semAnpr0 ? undefined : () => regs({ chaves: 'anpr' })} />
             <Kpi label="Infrações por 1.000 placas" value={indice == null ? '—' : indice.toLocaleString('pt-BR', { maximumFractionDigits: indice < 10 ? 1 : 0 })}
-              sub={indice == null ? 'sem leituras de placa no período' : `${fmtN(k.placas_infratoras)} placas diferentes autuadas`} />
+              sub={indice == null ? (semAnpr0 ? 'depende das leituras de placa (ANPR desligado)' : 'sem leituras de placa no período') : `${fmtN(k.placas_infratoras)} placas diferentes autuadas`} />
             <Kpi label="Aguardando validação" value={fmtN(k.aguardando)} sub={pico ? `pico às ${gran === 'hora' ? `${pico.b}h` : fmtDia(pico.b)} (${fmtN(pico.n)} infrações)` : '—'}
               onClick={() => regs({ validacao: 'aguardando', chaves: semAnpr })} />
             <Kpi label="Validadas" value={fmtN(k.validados)} bar={k.infracoes ? (k.validados / k.infracoes) * 100 : 0}
@@ -346,7 +350,7 @@ export default function Dashboard() {
 
           <div className="db-row r3">
             <Card title="Fluxo de placas lidas" sub={`Leituras ANPR ${gran === 'hora' ? 'por hora' : 'por dia'} · indica o movimento da via`}>
-              {k.anpr ? <Fluxo serie={d.serie} gran={gran} /> : <div className="db-empty">Sem leituras de placa no período.</div>}
+              {k.anpr && !semAnpr0 ? <Fluxo serie={d.serie} gran={gran} /> : <div className="db-empty">{semAnpr0 ? 'Leituras de placa não são gravadas neste servidor (SALVAR_ANPR=0).' : 'Sem leituras de placa no período.'}</div>}
             </Card>
             <Card title="Funil de validação" sub="Da detecção ao envio para a PRF">
               <div className="db-funil">
