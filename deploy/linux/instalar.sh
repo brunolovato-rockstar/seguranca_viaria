@@ -62,6 +62,7 @@ if [ ! -f "$ENV" ]; then
   read -rp  "  Usuário da câmera [admin]: " CAM_USER
   read -rsp "  Senha da câmera: " CAM_PW; echo
   read -rp  "  Chave pública do Mapbox (pk..., Enter para pular): " MAPBOX
+  read -rp  "  Porta do site [80]: " PORTA
   set_env JWT_SECRET "$(openssl rand -hex 32)"
   set_env CRYPTO_KEY "$(openssl rand -hex 32)"
   set_env DB_USER svapp
@@ -72,6 +73,7 @@ if [ ! -f "$ENV" ]; then
   set_env CAM1_PASSWORD "$CAM_PW"
   set_env MAPBOX_TOKEN "$MAPBOX"
   set_env RESTART_BY_EXIT 1
+  set_env PORT "${PORTA:-80}"
   echo "  .env criado"
 else
   set_env DB_PASSWORD "$SENHA_DB"
@@ -92,12 +94,14 @@ sed "s|^ExecStart=.*|ExecStart=$(command -v node) src/index.js|" "$APP/deploy/li
 systemctl daemon-reload
 systemctl enable seguranca-viaria >/dev/null 2>&1
 systemctl restart seguranca-viaria
-if command -v ufw >/dev/null && ufw status | grep -q 'Status: active'; then ufw allow 3001/tcp >/dev/null && echo "Firewall: porta 3001 liberada"; fi
+PORTA=$(grep -E '^PORT=' "$ENV" | cut -d= -f2-); PORTA=${PORTA:-3001}
+if command -v ufw >/dev/null && ufw status | grep -q 'Status: active'; then ufw allow "$PORTA/tcp" >/dev/null && echo "Firewall: porta $PORTA liberada"; fi
 sleep 4
-if curl -fsS localhost:3001/api/health >/dev/null; then
-  IP=$(hostname -I | awk '{print $1}')
+if curl -fsS "localhost:$PORTA/api/health" >/dev/null; then
+  IP=$(curl -fsS --max-time 3 https://checkip.amazonaws.com 2>/dev/null || hostname -I | awk '{print $1}')
+  [ "$PORTA" = "80" ] && URL="http://$IP" || URL="http://$IP:$PORTA"
   echo
-  echo "PRONTO: http://$IP:3001   (usuário admin)"
+  echo "PRONTO: $URL   (usuário admin)"
   echo "Log: sudo journalctl -u seguranca-viaria -f   ou na tela Diagnóstico → Sistema e log"
 else
   echo "O serviço não respondeu. Últimas linhas do log:"

@@ -67,7 +67,7 @@ sudo systemctl daemon-reload && sudo systemctl enable --now seguranca-viaria
 sudo visudo -f /etc/sudoers.d/seguranca-viaria      # cole a linha da sua VPN (ver sudoers-seguranca-viaria)
 ```
 
-Acesse `http://IP-DO-SERVIDOR:3001`. Em **Diagnóstico → Sistema e log** ficam o log ao vivo,
+Acesse `http://IP-DO-SERVIDOR` (porta 80; o instalador pergunta a porta, padrão 80 — em servidor já instalado use `PORT=80` no `.env` e rode o `atualizar.sh`). Em **Diagnóstico → Sistema e log** ficam o log ao vivo,
 o teste de rede da câmera e os botões Reconectar câmeras / Reiniciar VPN / Reiniciar servidor.
 
 Log também em `journalctl -u seguranca-viaria -f` e em `server/storage/logs/servidor-AAAA-MM-DD.log`.

@@ -23,6 +23,9 @@ echo "→ Banco (tabelas e analíticos novos; não apaga dados)"
 (cd server && as npm run db:init)
 
 echo "→ Reiniciando o serviço"
+# reinstala o arquivo do serviço (pega ajustes novos, ex.: permissão para a porta 80)
+sed "s|^ExecStart=.*|ExecStart=$(command -v node) src/index.js|" "$APP/deploy/linux/seguranca-viaria.service" > /etc/systemd/system/seguranca-viaria.service
+systemctl daemon-reload
 systemctl restart seguranca-viaria
 sleep 3
 systemctl --no-pager --lines=5 status seguranca-viaria || true
